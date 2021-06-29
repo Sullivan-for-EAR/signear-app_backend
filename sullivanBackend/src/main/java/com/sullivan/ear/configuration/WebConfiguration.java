@@ -16,8 +16,8 @@ public class WebConfiguration implements WebMvcConfigurer {
 		.addPathPatterns("/sign/**")
 		.addPathPatterns("/customer/**")
 		.addPathPatterns("/user/**")
-		.addPathPatterns("/management/**");
-		//.addPathPatterns("/reservation/**");
+		.addPathPatterns("/management/**")
+		.addPathPatterns("/reservation/**");
 		//.excludePathPatterns("/api/auth/test", "/api/auth/kakao", "/api/auth/kakao/callback", "/scripts/**");
 	}
 
