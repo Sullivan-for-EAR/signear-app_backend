@@ -1,6 +1,8 @@
 package com.sullivan.ear.reservation.controller;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,9 +38,12 @@ public class SignReservationController {
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public List<Reservation> getSignReservationList() {
+	public List<Reservation> getSignReservationList(@RequestParam Integer sign_id) {
 		
-		List<Reservation> ReservationResult = reservationService.findAllSignReservation();
+		SignUser singuser = signUserService.findOne(sign_id).get();
+		String address = singuser.getAddress();
+			
+		List<Reservation> ReservationResult = reservationService.findAllSignReservation(address);
 
 		return ReservationResult;
 	}
@@ -60,14 +65,15 @@ public class SignReservationController {
 		SignUser singuser = signUserService.findOne(sign_id).get();			
 		reservationMap.setSignUser(singuser);
 		
-		Reservation ReservationResult = reservationService.update(reservationMap);
-		
-		return ReservationResult;
+		return reservationService.update(reservationMap);
 		
 	}
 	
 	@RequestMapping(value = "/reject/{rsID}", method = RequestMethod.POST)
-	public Reservation cancleReservation(@PathVariable("rsID") Integer reservation_id, @RequestParam Integer sign_id, @RequestBody String reject) {
+	public Reservation cancleReservation(@PathVariable("rsID") Integer reservation_id, @RequestBody Map<String, Object> params) {
+		
+		String reject = params.get("reject").toString();
+	    int sign_id = Integer.parseInt(params.get("sign_id").toString());
 		
 		Reservation reservationMap = reservationService.findOne(reservation_id).get();
 		reservationMap.setStatus(5); //5:예약거절
@@ -76,9 +82,7 @@ public class SignReservationController {
 		SignUser singuser = signUserService.findOne(sign_id).get();			
 		reservationMap.setSignUser(singuser);
 		
-		Reservation ReservationResult = reservationService.update(reservationMap);
-		
-		return ReservationResult;
+		return reservationService.update(reservationMap);
 		
 	}
 	

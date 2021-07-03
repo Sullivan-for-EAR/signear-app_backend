@@ -30,10 +30,10 @@ public class CustomerReservationController {
 		
 	}
 	
-	@RequestMapping(value = "/cancle/{rsID}", method = RequestMethod.POST)
-	public Reservation cancleReservation(@PathVariable("rsID") Integer reservation_id) {
+	@RequestMapping(value = "/cancel/{rsID}", method = RequestMethod.POST)
+	public Reservation cancelReservation(@PathVariable("rsID") Integer reservation_id) {
 		
-		return reservationService.cancle(reservation_id);
+		return reservationService.cancel(reservation_id);
 		
 	}
 	

@@ -77,7 +77,7 @@ public class SignLoginController {
 		SignUserDTO signDTO = new SignUserDTO();
 		signDTO.setSignID(userMap.getSignID());
 		signDTO.setEmail(userMap.getEmail());
-		signDTO.setPhone(userMap.getPhone());
+		signDTO.setAddress(userMap.getAddress());
 
 		if (userMap != null && userMap.getSignID() != null) {
 			// JWT 발급

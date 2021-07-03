@@ -11,8 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sullivan.ear.exception.ApiException;
+import com.sullivan.ear.exception.ExceptionEnum;
 import com.sullivan.ear.reservation.repository.ReservationRepository;
-import com.sullivan.ear.vo.CustomerUser;
 import com.sullivan.ear.vo.Reservation;
 
 @Service
@@ -36,14 +37,13 @@ public class ReservationService {
 		return ReservationRepository.findAll();
 	}
 	
-	public List<Reservation> findAllSignReservation() {
+	public List<Reservation> findAllSignReservation(String address) {
 		
 		List<Integer> status = new ArrayList<>();
-		status.add(3); // 3:예약확정
-		status.add(4); // 4.예약취소
-		status.add(5); // 5:예약거절
+		status.add(1); // 1:읽지않음
+		status.add(2); // 2:센터확인중
 		
-		return ReservationRepository.findByStatusNotIn(status);
+		return ReservationRepository.findByAreaAndStatusIn(address, status);
 	}
 
 	public Optional<Reservation> findOne(Integer Reservation_id) {
@@ -59,17 +59,26 @@ public class ReservationService {
 	}
 
 	public Reservation create(Reservation reservation) {
+		
+		Integer customerID = reservation.getCustomerUser().getCustomerID();
+		String date = LocalDateTime.now().toString().substring(0, 10).replaceAll("-", "");
+		List<Reservation> reservationList = ReservationRepository.findByCustomerIDDate(customerID, date);
+		
+		if (reservationList.size() > 0) {
+			throw new ApiException(ExceptionEnum.SECURITY_03);
+		}
+		
 		return ReservationRepository.save(reservation);
 	}
 	
-	public Reservation cancle(Integer Reservation_id) {		
+	public Reservation cancel(Integer Reservation_id) {		
 	   Reservation reservationMap = ReservationRepository.findById(Reservation_id).get();
 	   reservationMap.setStatus(4); //4.예약취소
 	   
 	   return ReservationRepository.save(reservationMap);
 	}
 	
-	public Reservation emergencyCancle(Integer Reservation_id) {
+	public Reservation emergencyCancel(Integer Reservation_id) {
 	   Reservation reservationMap = ReservationRepository.findById(Reservation_id).get();
 	   reservationMap.setStatus(9); // 9: 긴급통역 취소
 

@@ -12,7 +12,8 @@ public enum ExceptionEnum {
     ACCESS_DENIED_EXCEPTION(HttpStatus.UNAUTHORIZED, "E0002"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E0003"),
     SECURITY_01(HttpStatus.UNAUTHORIZED, "S0001", "계정 정보를 다시 확인 바랍니다."), 
-    SECURITY_02(HttpStatus.UNAUTHORIZED, "S0002", "존재하는 사용자 정보 입니다."); 
+    SECURITY_02(HttpStatus.UNAUTHORIZED, "S0002", "존재하는 사용자 정보 입니다."),
+	SECURITY_03(HttpStatus.UNAUTHORIZED, "S0003", "금일 긴급 통역이 존재합니다."); 
 
     private final HttpStatus status;
     private final String code;

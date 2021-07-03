@@ -62,7 +62,7 @@ public class UserController {
 		SignUserDTO signDTO = new SignUserDTO();
 		signDTO.setSignID(userResult.getSignID());
 		signDTO.setEmail(userResult.getEmail());
-		signDTO.setPhone(userResult.getPhone());
+		signDTO.setAddress(userResult.getAddress());
 
 		String jwtToken = jwtService.createToken(userResult.getEmail());
 
@@ -93,7 +93,7 @@ public class UserController {
 		SignUserDTO userDTO = new SignUserDTO();
 		userDTO.setSignID(userResultMap.getSignID());
 		userDTO.setEmail(userResultMap.getEmail());
-		userDTO.setPhone(userResultMap.getPhone());
+		userDTO.setAddress(userResultMap.getAddress());
 
 		return userDTO;
 	}

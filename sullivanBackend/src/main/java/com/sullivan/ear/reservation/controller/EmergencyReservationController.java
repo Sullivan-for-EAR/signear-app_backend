@@ -33,10 +33,10 @@ public class EmergencyReservationController {
 		
 	}
 	
-	@RequestMapping(value = "/cancle/{rsID}", method = RequestMethod.POST)
+	@RequestMapping(value = "/cancel/{rsID}", method = RequestMethod.POST)
 	public Reservation cancleReservation(@PathVariable("rsID") Integer reservation_id) {
 			
-		return reservationService.emergencyCancle(reservation_id);
+		return reservationService.emergencyCancel(reservation_id);
 		
 	}
 	

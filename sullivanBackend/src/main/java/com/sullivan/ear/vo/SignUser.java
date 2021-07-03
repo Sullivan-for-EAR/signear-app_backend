@@ -36,9 +36,6 @@ public class SignUser {
 	@Column(name = "password")
     private String password;
 	
-	@Column(name = "phone")
-    private String phone;
-	
 	@Column(name = "address")
     private String address;
 	
