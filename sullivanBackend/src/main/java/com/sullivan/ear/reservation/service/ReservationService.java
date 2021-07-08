@@ -1,7 +1,10 @@
 package com.sullivan.ear.reservation.service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +46,13 @@ public class ReservationService {
 		status.add(1); // 1:읽지않음
 		status.add(2); // 2:센터확인중
 		
-		return ReservationRepository.findByAreaAndStatusIn(address, status);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());		
+		cal.add(Calendar.DATE, -1);
+		String date = dateFormat.format(cal.getTime());
+		
+		return ReservationRepository.findByAreaAndStatusInAndDateGreaterThan(address, status, date);
 	}
 
 	public Optional<Reservation> findOne(Integer Reservation_id) {
@@ -90,12 +99,12 @@ public class ReservationService {
 	}
 	
 	public List<Reservation> getListByCustomerID(Integer customerID) {
-		String localTime = LocalDateTime.now().toString().substring(0, 10);
+		String localTime = LocalDateTime.now().toString().substring(0, 10).replaceAll("-", "");
 		return ReservationRepository.findByCustomerID(customerID, localTime);
 	}
 	
 	public List<Reservation> getListBySignID(Integer signID) {
-		String localTime = LocalDateTime.now().toString().substring(0, 10);
+		String localTime = LocalDateTime.now().toString().substring(0, 10).replaceAll("-", "");
 		return ReservationRepository.findBySignID(signID, localTime);
 	}
 	

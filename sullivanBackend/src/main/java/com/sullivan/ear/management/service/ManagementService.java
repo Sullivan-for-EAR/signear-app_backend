@@ -12,14 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sullivan.ear.management.dao.ManagementDTO;
+import com.sullivan.ear.management.repository.ManagementHistoryRepository;
 import com.sullivan.ear.management.repository.ManagementRepository;
 import com.sullivan.ear.vo.Reservation;
+import com.sullivan.ear.vo.ReservationHistory;
 
 @Service
 @Transactional
 public class ManagementService {
 
 	ManagementRepository managementRepository;
+	
+	ManagementHistoryRepository managementHistoryRepository;
 	//1:읽지않음, 2:센터확인중, 3:예약확정, 4.예약취소, 5:예약거절, 
 	//6: 통역취소, 7:통역 완료, 8: 긴급통역 연결중, 9: 긴급통역 취소, 10: 긴급통역 승인
 	
@@ -32,23 +36,24 @@ public class ManagementService {
     //-> 3, 10 케이스
 	
 	@Autowired
-	public ManagementService(ManagementRepository managementRepository) {
+	public ManagementService(ManagementRepository managementRepository, ManagementHistoryRepository managementHistoryRepository) {
 
 		this.managementRepository = managementRepository;
+		this.managementHistoryRepository = managementHistoryRepository;
 	}
 	
-	public List<ManagementDTO> getListByCustomerID(Integer customerID) {
-		String localTime = LocalDateTime.now().toString().substring(0, 10);
+	public List<Reservation> getListByCustomerID(Integer customerID) {
+		String localTime = LocalDateTime.now().toString().substring(0, 10).replaceAll("-", "");
 		List<Reservation> customerManagementList = managementRepository.findByCustomerID(customerID, localTime);
-		List<ManagementDTO> customerManagementReturnList = this.getList(customerManagementList);
+		List<Reservation> customerManagementReturnList = this.getList(customerManagementList);
 		
 		return customerManagementReturnList;
 	}
 	
-	public List<ManagementDTO> getListBySignID(Integer signID) {	
-		String localTime = LocalDateTime.now().toString().substring(0, 10);
+	public List<Reservation> getListBySignID(Integer signID) {	
+		String localTime = LocalDateTime.now().toString().substring(0, 10).replaceAll("-", "");
 		List<Reservation> signManagementList = managementRepository.findBySignID(signID, localTime);
-		List<ManagementDTO> signManagementReturnList = this.getList(signManagementList);
+		List<Reservation> signManagementReturnList = this.getList(signManagementList);
 				
 		return signManagementReturnList;
 	}
@@ -60,41 +65,56 @@ public class ManagementService {
 	public int getCurrentTime(int gap) {
 		
 		SimpleDateFormat date = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat hour = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());		
 		cal.add(Calendar.DATE, -gap);	
 		String ysTime = date.format(cal.getTime());
+		String hourTime = hour.format(new Date()).replaceAll(":", "").substring(0, 2);
 		
-		return Integer.parseInt(ysTime);
+		String finalTime = ysTime + hourTime;
+		
+		return Integer.parseInt(finalTime);
 	}
 	
-    public List<ManagementDTO> getList(List<Reservation> ManagementList) {
+    public List<Reservation> getList(List<Reservation> ManagementList) {
 		
-		List<ManagementDTO> returnList = new ArrayList();
+		List<Reservation> returnList = new ArrayList();
 		
 		for(Reservation management: ManagementList) {
 		
-            ManagementDTO managementDTO = this.getManagementMapper(management);
+            //ManagementDTO managementDTO = this.getManagementMapper(management);
+            ReservationHistory reservationHistory = new ReservationHistory();
+            reservationHistory.setRsID(management.getRsID());
+            reservationHistory.setFromStatus(management.getStatus());
 			
 			int status = management.getStatus();
 		    if (status == 1 || status == 2 || status == 4 || status == 5 || status == 9) {
-		    	managementDTO.setStatus(6);
+		    	management.setStatus(6);
+		    	reservationHistory.setToStatus(6);
+		    	managementHistoryRepository.save(reservationHistory);
 		    }
 		    
 		    if (status == 8) {
 		    	int currenTime = this.getCurrentTime(1);
-		    	int myDate = Integer.parseInt(management.getDate().replaceAll("-", "")) + Integer.parseInt(management.getStart_time());
+		    	int myDate = Integer.parseInt(management.getDate().replaceAll("-", "") + management.getStart_time().substring(0, 2));
 		    	
-		    	if (currenTime > myDate)
-		    		managementDTO.setStatus(6);
+		    	if (currenTime > myDate) {
+		    		management.setStatus(6);
+		    		reservationHistory.setToStatus(6);
+			    	managementHistoryRepository.save(reservationHistory);
+		    	}
+		    		
 		    }
 		    
 		    if (status == 3 || status == 10) {
-		    	managementDTO.setStatus(7);
+		    	management.setStatus(7);
+	    		reservationHistory.setToStatus(7);
+		    	managementHistoryRepository.save(reservationHistory);
 		    }
 		    
-		    if (managementDTO.getStatus()!= 8) {
-		    	returnList.add(managementDTO);
+		    if (management.getStatus()!= 8) {
+		    	returnList.add(management);
 		    }
 		}
 			

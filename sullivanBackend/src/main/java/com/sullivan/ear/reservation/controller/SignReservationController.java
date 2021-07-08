@@ -32,9 +32,13 @@ public class SignReservationController {
 		
 		//예약 상태 한번이라도 조회로 업데이트
 		Reservation reservationResult = reservationService.getOneByRsID(reservation_id);
-		reservationResult.setStatus(2);
 		
-		return reservationService.update(reservationResult);
+		if (reservationResult.getStatus() == 1) {
+			reservationResult.setStatus(2);
+			reservationResult = reservationService.update(reservationResult);
+		}
+	
+		return reservationResult;
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)

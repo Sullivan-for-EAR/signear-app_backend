@@ -13,7 +13,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 		
 	Reservation findByRsID(Integer rsID);
 	
-	List<Reservation> findByAreaAndStatusIn(String address, List<Integer> status);
+	List<Reservation> findByAreaAndStatusInAndDateGreaterThan(String address, List<Integer> status, String date);
 
 	@Query("SELECT r FROM Reservation r join fetch r.customerUser c where c.customerID =:customerID and r.date = :date and r.status = 8")
 	List<Reservation> findByCustomerIDDate(Integer customerID, String date);
@@ -21,7 +21,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r join fetch r.customerUser c where c.customerID =:customerID and r.date >= :threshold")
     List<Reservation> findByCustomerID(Integer customerID, String threshold);
     
-    @Query("SELECT r FROM Reservation r join fetch r.signUser c where c.signID =:signID and r.status = 3 and r.date >=:threshold")
+    @Query("SELECT r FROM Reservation r join fetch r.signUser c where c.signID =:signID and r.status in (3, 4) and r.date >=:threshold")
     List<Reservation> findBySignID(Integer signID, String threshold);
 	
 }
